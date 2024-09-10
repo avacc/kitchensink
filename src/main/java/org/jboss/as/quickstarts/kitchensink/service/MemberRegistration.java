@@ -16,30 +16,49 @@
  */
 package org.jboss.as.quickstarts.kitchensink.service;
 
+import com.mongodb.client.MongoClient;
+import org.jboss.as.quickstarts.kitchensink.data.MemberRepository;
+import org.jboss.as.quickstarts.kitchensink.model.DatabaseSequence;
 import org.jboss.as.quickstarts.kitchensink.model.Member;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Service;
 
-import jakarta.ejb.Stateless;
-import jakarta.enterprise.event.Event;
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
+import java.math.BigInteger;
+import java.util.Objects;
 import java.util.logging.Logger;
 
-// The @Stateless annotation eliminates the need for manual transaction demarcation
-@Stateless
+@Service
 public class MemberRegistration {
+    private final Logger log;
 
-    @Inject
-    private Logger log;
+    private final MongoOperations mongoOperations;
 
-    @Inject
-    private EntityManager em;
+    private final MemberRepository memberRepository;
 
-    @Inject
-    private Event<Member> memberEventSrc;
+    @Autowired
+    public MemberRegistration(final MongoOperations mongoOperations, final MemberRepository memberRepository, MongoClient mongo) {
+        log = Logger.getLogger(getClass().getName());
+        this.mongoOperations = mongoOperations;
+        this.memberRepository = memberRepository;
+    }
 
-    public void register(Member member) throws Exception {
-        log.info("Registering " + member.getName());
-        em.persist(member);
-        memberEventSrc.fire(member);
+    public void register(Member member) {
+        member.setId(generateSequence(Member.SEQUENCE_NAME));
+        memberRepository.insert(member);
+    }
+
+    private BigInteger generateSequence(String sequenceName) {
+        DatabaseSequence counter = mongoOperations.findAndModify(
+                Query.query(Criteria.where("_id").is(sequenceName)),
+                new Update().inc("sequence", 1),
+                FindAndModifyOptions.options().returnNew(true).upsert(true),
+                DatabaseSequence.class
+        );
+        return !Objects.isNull(counter) ? counter.getSequence() : BigInteger.ONE;
     }
 }

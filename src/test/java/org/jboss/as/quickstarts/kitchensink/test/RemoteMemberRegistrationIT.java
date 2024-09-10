@@ -19,6 +19,7 @@ package org.jboss.as.quickstarts.kitchensink.test;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
+import java.math.BigInteger;
 import java.util.logging.Logger;
 
 import java.net.URI;
@@ -28,20 +29,24 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 import org.jboss.as.quickstarts.kitchensink.model.Member;
+import org.json.JSONObject;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public class RemoteMemberRegistrationIT {
 
     private static final Logger log = Logger.getLogger(RemoteMemberRegistrationIT.class.getName());
 
+    private BigInteger createdId;
+
     protected URI getHTTPEndpoint() {
         String host = getServerHost();
         if (host == null) {
-            host = "http://localhost:8080/kitchensink";
+            host = "http://localhost:8080";
         }
         try {
-            return new URI(host + "/rest/members");
+            return new URI(host + "/api/members");
         } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
@@ -70,8 +75,22 @@ public class RemoteMemberRegistrationIT {
                 .POST(HttpRequest.BodyPublishers.ofString(json.toString()))
                 .build();
         HttpResponse response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-        Assert.assertEquals(200, response.statusCode());
-        Assert.assertEquals("", response.body().toString() );
+        Assert.assertEquals(201, response.statusCode());
+        JSONObject jsonObject = new JSONObject(response.body().toString());
+        log.info("Member was created: " + jsonObject);
+        createdId = new BigInteger(jsonObject.getString("id"));
     }
 
+    @AfterEach
+    public void cleanUp() throws Exception {
+        if (createdId != null) {
+            log.info("Attempting cleanup of test member " + createdId + "...");
+            HttpRequest request = HttpRequest.newBuilder(getHTTPEndpoint().resolve("/api/members/" + createdId))
+                    .header("Content-Type", "application/json")
+                    .DELETE()
+                    .build();
+            HttpResponse response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            log.info("Cleanup test member response: " + response);
+        }
+    }
 }

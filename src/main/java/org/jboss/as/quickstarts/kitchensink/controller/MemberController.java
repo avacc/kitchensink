@@ -17,68 +17,83 @@
 package org.jboss.as.quickstarts.kitchensink.controller;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.inject.Model;
-import jakarta.enterprise.inject.Produces;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
+import jakarta.faces.view.ViewScoped;
+import org.jboss.as.quickstarts.kitchensink.data.MemberListProducer;
 import org.jboss.as.quickstarts.kitchensink.model.Member;
 import org.jboss.as.quickstarts.kitchensink.service.MemberRegistration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
-// The @Model stereotype is a convenience mechanism to make this a request-scoped bean that has an
-// EL name
-// Read more about the @Model stereotype in this FAQ:
-// http://www.cdi-spec.org/faq/#accordion6
-@Model
+import java.util.List;
+
+@Controller
+@ViewScoped
 public class MemberController {
-
-    @Inject
-    private FacesContext facesContext;
-
-    @Inject
-    private MemberRegistration memberRegistration;
-
-    @Produces
-    @Named
+    private final MemberRegistration memberRegistration;
+    private final MemberListProducer memberListProducer;
     private Member newMember;
+    private List<Member> members;
+
+    @Autowired
+    public MemberController(MemberRegistration memberRegistration, MemberListProducer memberListProducer) {
+        this.memberRegistration = memberRegistration;
+        this.memberListProducer = memberListProducer;
+    }
 
     @PostConstruct
-    public void initNewMember() {
+    public void refresh() {
         newMember = new Member();
+        memberListProducer.retrieveAllMembersOrderedByName();
+        members = memberListProducer.getMembers();
     }
 
     public void register() throws Exception {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        if (newMember.getName().isEmpty() || newMember.getEmail().isEmpty() || newMember.getPhoneNumber().isEmpty()) {
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid member details", "One or more member details is blank"));
+        }
         try {
             memberRegistration.register(newMember);
-            FacesMessage m = new FacesMessage(FacesMessage.SEVERITY_INFO, "Registered!", "Registration successful");
-            facesContext.addMessage(null, m);
-            initNewMember();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Registered!", "Registration successful");
+            facesContext.addMessage(null, msg);
+            refresh();
         } catch (Exception e) {
             String errorMessage = getRootErrorMessage(e);
-            FacesMessage m = new FacesMessage(FacesMessage.SEVERITY_ERROR, errorMessage, "Registration unsuccessful");
-            facesContext.addMessage(null, m);
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, errorMessage, "Registration unsuccessful");
+            facesContext.addMessage(null, msg);
         }
     }
 
     private String getRootErrorMessage(Exception e) {
-        // Default to general error message that registration failed.
-        String errorMessage = "Registration failed. See server log for more information";
+        String errorMessage = "Registration failed";
         if (e == null) {
-            // This shouldn't happen, but return the default messages
             return errorMessage;
         }
 
-        // Start with the exception and recurse to find the root cause
-        Throwable t = e;
-        while (t != null) {
-            // Get the message from the Throwable class instance
-            errorMessage = t.getLocalizedMessage();
-            t = t.getCause();
+        Throwable cause = e;
+        while (cause != null) {
+            errorMessage = cause.getLocalizedMessage();
+            cause = cause.getCause();
         }
-        // This is the root cause message
+
         return errorMessage;
     }
 
+    public List<Member> getMembers() {
+        return members;
+    }
+
+    public void setMembers(List<Member> members) {
+        this.members = members;
+    }
+
+    public Member getNewMember() {
+        return newMember;
+    }
+
+    public void setNewMember(Member newMember) {
+        this.newMember = newMember;
+    }
 }
