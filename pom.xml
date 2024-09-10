@@ -19,20 +19,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.jboss.eap.quickstarts</groupId>
-        <artifactId>jboss-eap-quickstart-parent</artifactId>
-        <!--
-        Maintain separation between the artifact id and the version to help prevent
-        merge conflicts between commits changing the GA and those changing the V.
-        -->
-        <version>6.0.0.redhat-00001</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.2</version>
         <relativePath/>
     </parent>
     <artifactId>kitchensink</artifactId>
     <version>8.0.0.GA</version>
     <packaging>war</packaging>
     <name>Quickstart: kitchensink</name>
-    <description>A starter Jakarta EE web application project for use in JBoss EAP</description>
+    <description>A starter Jakarta EE web application (modified for use with Spring Boot, Java 21, and MongoDB) for use in JBoss EAP</description>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -55,9 +51,8 @@
 
         <version.surefire.maven.plugin>3.3.1</version.surefire.maven.plugin>
         <version.failsafe.maven.plugin>3.3.1</version.failsafe.maven.plugin>
-        <version.jboss.deploy.maven.plugin>7.9.Final</version.jboss.deploy.maven.plugin>
+        <version.wildfly.maven.plugin>5.0.0.Final</version.wildfly.maven.plugin>
 
-        <!-- The versions for BOMs, Dependencies and Plugins -->
         <version.server.bom>8.0.0.GA-redhat-00009</version.server.bom>
         <version.eap.maven.plugin>1.0.0.Final-redhat-00014</version.eap.maven.plugin>
         <version.compiler.maven.plugin>3.11.0</version.compiler.maven.plugin>
@@ -131,8 +126,26 @@
                     <target>${java.version}</target>
                     <testSource>${java.version}</testSource>
                     <testTarget>${java.version}</testTarget>
-                    <compilerVersion>${java.version}</compilerVersion>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${version.failsafe.maven.plugin}</version>
+                <configuration>
+                    <includes>
+                        <include>**/RemoteMemberRegistrationIT</include>
+                        <include>**/MemberRegistrationIT</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>verify</goal>
+                            <goal>integration-test</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -143,12 +156,9 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.jboss.as.plugins</groupId>
-                <artifactId>jboss-as-maven-plugin</artifactId>
-                <version>${version.jboss.deploy.maven.plugin}</version>
-                <configuration>
-                    <version>8.0.0</version>
-                </configuration>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>${version.wildfly.maven.plugin}</version>
             </plugin>
         </plugins>
     </build>
@@ -168,12 +178,6 @@
 
     <dependencies>
         <!-- Post-migration dependencies -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>${version.spring.core}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -204,13 +208,6 @@
             <version>${version.mongodb.driver}</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.joinfaces</groupId>-->
-<!--            <artifactId>joinfaces-dependencies</artifactId>-->
-<!--            <version>${version.joinfaces}</version>-->
-<!--            <type>pom</type>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>org.joinfaces</groupId>
             <artifactId>faces-spring-boot-starter</artifactId>
@@ -234,13 +231,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <version>${version.spring.boot.test}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers</artifactId>
-            <version>${version.testcontainers}</version>
             <scope>test</scope>
         </dependency>
 
@@ -273,7 +263,6 @@
         <dependency>
             <groupId>jakarta.enterprise</groupId>
             <artifactId>jakarta.enterprise.cdi-api</artifactId>
-<!--            <version>4.1.0</version>-->
             <scope>provided</scope>
         </dependency>
 
@@ -287,7 +276,6 @@
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
-<!--            <version>3.1.0</version>-->
             <scope>provided</scope>
         </dependency>
 
@@ -296,7 +284,6 @@
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
-<!--            <version>3.0.0</version>-->
             <scope>provided</scope>
         </dependency>
 
@@ -305,7 +292,6 @@
         <dependency>
             <groupId>jakarta.ejb</groupId>
             <artifactId>jakarta.ejb-api</artifactId>
-<!--            <version>4.0.1</version>-->
             <scope>provided</scope>
         </dependency>
 
@@ -314,14 +300,12 @@
         <dependency>
             <groupId>jakarta.faces</groupId>
             <artifactId>jakarta.faces-api</artifactId>
-<!--            <version>4.1.0</version>-->
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
-<!--            <version>4.0.2</version>-->
             <scope>provided</scope>
         </dependency>
 
@@ -330,52 +314,11 @@
             <artifactId>jakarta.json-api</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.eclipse.parsson</groupId>
             <artifactId>parsson</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
-
-    <profiles>
-        <profile>
-            <!-- An optional Arquillian testing profile that executes tests in a remote JBoss EAP instance.
-            Run with: mvn clean verify -Parq-remote -->
-            <id>arq-remote</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.wildfly.arquillian</groupId>
-                    <artifactId>wildfly-arquillian-container-remote</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>${version.failsafe.maven.plugin}</version>
-                        <configuration>
-                            <includes>
-                                <include>**/RemoteMemberRegistrationIT</include>
-                            </includes>
-                            <excludes>
-                                <exclude>**/MemberRegistrationIT</exclude>
-                            </excludes>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                    <goal>verify</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
 </project>

@@ -16,10 +16,7 @@
  */
 package org.jboss.as.quickstarts.kitchensink.rest;
 
-import java.math.BigInteger;
-import java.util.List;
-import java.util.logging.Logger;
-
+import jakarta.validation.ValidationException;
 import org.jboss.as.quickstarts.kitchensink.data.MemberRepository;
 import org.jboss.as.quickstarts.kitchensink.model.Member;
 import org.jboss.as.quickstarts.kitchensink.service.MemberRegistration;
@@ -35,6 +32,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigInteger;
+import java.util.List;
+import java.util.logging.Logger;
+
 /**
  * JAX-RS Example
  * <p/>
@@ -46,9 +47,10 @@ public class MemberResourceRESTService {
     private final MemberRepository repository;
     private final MemberRegistration registration;
 
+
     @Autowired
-    public MemberResourceRESTService(MemberRepository repository, MemberRegistration registration) {
-        this.log = Logger.getLogger(MemberResourceRESTService.class.getName());
+    public MemberResourceRESTService(Logger log, MemberRepository repository, MemberRegistration registration) {
+        this.log = log;
         this.repository = repository;
         this.registration = registration;
     }
@@ -64,7 +66,9 @@ public class MemberResourceRESTService {
     public Member lookupMemberById(@PathVariable("id") long id) {
         Member member = repository.findById(BigInteger.valueOf(id));
         if (member == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found");
+            ResponseStatusException e = new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found");
+            log.throwing(MemberResourceRESTService.class.getName(), "deleteMemberById", e);
+            throw e;
         }
         return member;
     }
@@ -73,7 +77,9 @@ public class MemberResourceRESTService {
     public void deleteMemberById(@PathVariable("id") long id) {
         Member member = repository.findById(BigInteger.valueOf(id));
         if (member == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found");
+            ResponseStatusException e = new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found");
+            log.throwing(MemberResourceRESTService.class.getName(), "deleteMemberById", e);
+            throw e;
         }
         repository.deleteMemberById(BigInteger.valueOf(id));
     }
@@ -86,83 +92,41 @@ public class MemberResourceRESTService {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public Member createMember(@RequestBody Member member) {
-
         try {
-            // Validates member using bean validation
-//            validateMember(member);
+            validateMember(member);
             registration.register(member);
-//        }
-//        catch (ConstraintViolationException ce) {
-//            // Handle bean validation issues
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ce.getConstraintViolations());
-////            builder = createViolationResponse(ce.getConstraintViolations());
-//        } catch (ValidationException e) {
-//            // Handle the unique constrain violation
-//            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use by another member");
-////            Map<String, String> responseObj = new HashMap<>();
-////            responseObj.put("email", "Email taken");
-////            builder = Response.status(Response.Status.CONFLICT).entity(responseObj);
+        } catch (ValidationException e) {
+            ResponseStatusException error = new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use by another member");
+            log.throwing(this.getClass().getName(), "createMember", error);
+            throw error;
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-            // Handle generic exceptions
-//            Map<String, String> responseObj = new HashMap<>();
-//            responseObj.put("error", e.getMessage());
-//            builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+            ResponseStatusException error = new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            log.throwing(this.getClass().getName(), "createMember", error);
+            throw error;
         }
-
         return member;
     }
 
     /**
      * <p>
-     * Validates the given Member variable and throws validation exceptions based on the type of error. If the error is standard
-     * bean validation errors then it will throw a ConstraintValidationException with the set of the constraints violated.
-     * </p>
-     * <p>
-     * If the error is caused because an existing member with the same email is registered it throws a regular validation
-     * exception so that it can be interpreted separately.
+     * Validates the given Member variable and throws validation exception if the error is caused because an existing member with the same email is registered
      * </p>
      *
      * @param member Member to be validated
-     * @throws ConstraintViolationException If Bean Validation errors exist
      * @throws ValidationException If member with the same email already exists
      */
-//    private void validateMember(Member member) throws ConstraintViolationException, ValidationException {
-//        // Create a bean validator and check for issues.
-//        Set<ConstraintViolation<Member>> violations = validator.(member);
-//
-//        if (!violations.isEmpty()) {
-//            throw new ConstraintViolationException(new HashSet<>(violations));
-//        }
-//
-//        // Check the uniqueness of the email address
-//        if (emailAlreadyExists(member.getEmail())) {
-//            throw new ValidationException("Unique Email Violation");
-//        }
-//    }
+    private void validateMember(Member member) throws ValidationException {
+        // Check the uniqueness of the email address
+        String email = member.getEmail();
+        if (emailAlreadyExists(email)) {
+            ValidationException e = new ValidationException("Member already exists using email: " + email);
+            log.throwing(this.getClass().getName(), "validateMember", e);
+            throw e;
+        }
+    }
 
     /**
-     * Creates a JAX-RS "Bad Request" response including a map of all violation fields, and their message. This can then be used
-     * by clients to show violations.
-     *
-     * @param violations A set of violations that needs to be reported
-     * @return JAX-RS response containing all violations
-     */
-//    private Response.ResponseBuilder createViolationResponse(Set<ConstraintViolation<?>> violations) {
-//        log.fine("Validation completed. violations found: " + violations.size());
-//
-//        Map<String, String> responseObj = new HashMap<>();
-//
-//        for (ConstraintViolation<?> violation : violations) {
-//            responseObj.put(violation.getPropertyPath().toString(), violation.getMessage());
-//        }
-//
-//        return Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
-//    }
-
-    /**
-     * Checks if a member with the same email address is already registered. This is the only way to easily capture the
-     * "@UniqueConstraint(columnNames = "email")" constraint from the Member class.
+     * Checks if a member with the same email address is already registered. Returns a more friendly error response
      *
      * @param email The email to check
      * @return True if the email already exists, and false otherwise

@@ -17,6 +17,7 @@
 package org.jboss.as.quickstarts.kitchensink.test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.logging.Logger;
 
@@ -24,7 +25,7 @@ import org.jboss.as.quickstarts.kitchensink.Main;
 import org.jboss.as.quickstarts.kitchensink.model.Member;
 import org.jboss.as.quickstarts.kitchensink.service.MemberRegistration;
 import org.jboss.as.quickstarts.kitchensink.test.config.MongoDBConfig;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,9 +48,13 @@ public class MemberRegistrationIT {
         newMember.setName("Jane Doe");
         newMember.setEmail("jane@mailinator.com");
         newMember.setPhoneNumber("2125551234");
-        memberRegistration.register(newMember);
-        assertNotNull(newMember.getId());
-        log.info(newMember.getName() + " was persisted with id " + newMember.getId());
+        try {
+            memberRegistration.register(newMember);
+            assertNotNull(newMember.getId());
+            log.info(newMember.getName() + " was persisted with id " + newMember.getId());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
 
 }

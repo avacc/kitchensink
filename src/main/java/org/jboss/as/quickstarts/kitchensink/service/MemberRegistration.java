@@ -16,6 +16,7 @@
  */
 package org.jboss.as.quickstarts.kitchensink.service;
 
+import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoClient;
 import org.jboss.as.quickstarts.kitchensink.data.MemberRepository;
 import org.jboss.as.quickstarts.kitchensink.model.DatabaseSequence;
@@ -47,9 +48,14 @@ public class MemberRegistration {
         this.memberRepository = memberRepository;
     }
 
-    public void register(Member member) {
+    public void register(Member member) throws Exception {
         member.setId(generateSequence(Member.SEQUENCE_NAME));
-        memberRepository.insert(member);
+        try {
+            memberRepository.insert(member);
+        } catch (MongoWriteException e) {
+            throw new Exception(e.getLocalizedMessage());
+        }
+
     }
 
     private BigInteger generateSequence(String sequenceName) {
