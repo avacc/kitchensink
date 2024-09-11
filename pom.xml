@@ -25,12 +25,10 @@
         <relativePath/>
     </parent>
     <artifactId>kitchensink</artifactId>
-    <version>8.0.0.GA</version>
+    <version>1.0.0.RELEASE</version>
     <packaging>war</packaging>
     <name>Quickstart: kitchensink</name>
-    <description>A starter Jakarta EE web application (modified for use with Spring Boot, Java 21, and MongoDB) for use
-        in JBoss EAP
-    </description>
+    <description>A starter Jakarta EE web application (modified for use with Spring Boot, Java 21, and MongoDB)</description>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -69,21 +67,6 @@
     </properties>
 
     <repositories>
-        <!-- keep this repository the first -->
-        <repository>
-            <id>jboss-public-maven-repository</id>
-            <name>JBoss Public Maven Repository</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-            <layout>default</layout>
-        </repository>
         <repository>
             <id>redhat-ga-maven-repository</id>
             <name>Red Hat GA Maven Repository</name>
@@ -100,18 +83,6 @@
         </repository>
     </repositories>
     <pluginRepositories>
-        <!-- keep this repository the first -->
-        <pluginRepository>
-            <id>jboss-public-maven-repository</id>
-            <name>JBoss Public Maven Repository</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
         <pluginRepository>
             <id>redhat-ga-maven-repository</id>
             <name>Red Hat GA Maven Repository</name>
@@ -173,19 +144,6 @@
         </plugins>
     </build>
 
-    <dependencyManagement>
-        <dependencies>
-            <!-- importing the ee-with-tools BOM adds specs and other useful artifacts as managed dependencies -->
-            <dependency>
-                <groupId>org.jboss.bom</groupId>
-                <artifactId>jboss-eap-ee-with-tools</artifactId>
-                <version>${version.server.bom}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <!-- Post-migration dependencies -->
         <dependency>
@@ -223,6 +181,7 @@
             <artifactId>faces-spring-boot-starter</artifactId>
             <version>${version.joinfaces}</version>
             <exclusions>
+                <!-- Not needed when not running on JBoss EAP/Wildfly (e.g., simple Tomcat server) -->
                 <exclusion>
                     <groupId>org.jboss.weld.servlet</groupId>
                     <artifactId>*</artifactId>
@@ -233,7 +192,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
-            <version>${version.spring.boot}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -271,7 +229,7 @@
         <dependency>
             <groupId>jakarta.enterprise</groupId>
             <artifactId>jakarta.enterprise.cdi-api</artifactId>
-            <scope>provided</scope>
+            <version>${version.jakarta.enterprise.cdi}</version>
         </dependency>
 
         <!-- Needed for running tests (you may also use TestNG) -->

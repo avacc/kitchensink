@@ -3,15 +3,15 @@ package org.jboss.as.quickstarts.kitchensink.config;
 import org.jboss.as.quickstarts.kitchensink.model.DatabaseSequence;
 import org.jboss.as.quickstarts.kitchensink.model.Member;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.mapping.event.ValidatingMongoEventListener;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-@SpringBootConfiguration
+@Configuration
 public class ApplicationConfiguration implements ApplicationListener<ApplicationReadyEvent> {
 
     private final MongoOperations mongoOperations;

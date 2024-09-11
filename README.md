@@ -8,6 +8,9 @@ This project is a simplified migration of a Java-based web application using the
 
 ### Migration Overview
 #### Technologies Introduced
+
+The following technologies were introduced per explicit requirements or out of necessity for following **only** specific requirements
+
 * Java 21
 * Spring Boot
   * Replaces direct Jakarta CDI API
@@ -19,6 +22,8 @@ This project is a simplified migration of a Java-based web application using the
   * Enables ephemeral MongoDB Docker container when running unit tests
 
 #### Technologies Retained
+
+The following were retained in order to make as few assumptions as possible beyond the requirements provided:
 
 * Maven
 * Wildfly

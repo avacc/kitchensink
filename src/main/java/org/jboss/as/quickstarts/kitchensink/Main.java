@@ -2,6 +2,7 @@ package org.jboss.as.quickstarts.kitchensink;
 
 import org.jboss.as.quickstarts.kitchensink.config.ApplicationConfiguration;
 import org.jboss.as.quickstarts.kitchensink.data.MemberRepository;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
@@ -14,6 +15,10 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableMongoRepositories(basePackageClasses = MemberRepository.class)
 public class Main extends SpringBootServletInitializer {
     public static void main(String[] args) {
-        SpringApplication.run(ApplicationConfiguration.class, args);
+        try {
+            SpringApplication.run(ApplicationConfiguration.class, args);
+        } catch (Exception e) {
+            LoggerFactory.getLogger(Main.class).error(e.getStackTrace().toString(), e);
+        }
     }
 }
