@@ -4,7 +4,7 @@ Web-enabled database application adapted from [a JBoss quickstart project](https
 
 ## What is it?
 
-This project is a simplified migration of a Java-based web application using the following technologies:
+This project is the result of a simplified migration exercise of a Java-based web application.
 
 ### Migration Overview
 #### Technologies Introduced
@@ -13,7 +13,7 @@ The following technologies were introduced per explicit requirements or out of n
 
 * Java 21
 * Spring Boot
-  * Replaces direct Jakarta CDI API
+  * Replaces direct Jakarta CDI API and Jakarta REST service
 * MongoDB (integrated via Spring Data)
   * Replaces in-memory, relational H2 database integrated via JNDI
 * JoinFaces
@@ -44,16 +44,18 @@ The following were retained in order to make as few assumptions as possible beyo
 * [Docker](https://docs.docker.com/engine/install/) (needed when running tests)
 
 ### Build
-
+* Prior to deploying the application, you must have a MongoDB instance running (local or remote) and its connection details configured within `application.properties`
+  * **NOTE:** The MongoDB instance details pre-populated within `application.properties` are only applicable to a locally running instance. Remote instance details should never be committed to version control
 * To build the `.war` file necessary for running the application, run `mvn package`
   * When rerunning the build step, you can precede this command with `mvn clean` to delete the previous build's artifacts (i.e., the `target/` directory)
-  * **NOTE:** The Jakarta CDI API dependency should be included (i.e., `<scope>provided</scope>`) as part of Spring Boot starter, as well as EAP if that is where the application is deployed 
 
 ### Deploy
-* Prior to deploying the application, you must have a MongoDB instance running (local or remote) and its connection details configured within `application.properties`
-  * **NOTE:** The MongoDB instance details pre-populated within `application.properties` are only applicable to a locally running instance. Remote instance details should never be committed to version control 
 * The application can be deployed to a Wildfly server (local or remote) by running `mvn deploy`
-  * 
+  * Location of Wildfly server can be specified in `EAP_HOME` for local deployment and within the `configuration` tag of the Wildfly Maven plugin for a remote deployment
+  * **NOTE:** Dependencies have been largely extracted from reliance on JBoss EAP. Deploying the application to another application server (e.g., simple Tomcat server) should largely be a matter of:
+    1. Specifying the `spring-boot-start-tomcat` dependency in `pom.xml` as either provided by the new application server or bundled with the application itself
+    2. Removing the `org.jboss.weld.servlet` exclusion from the JoinFaces dependency in `pom.xml`
+    3. Specifying the application context path in a manner dictated by the target application server (e.g., in `application.properties`, in a `.xml` file in `webapp/WEB-INF`, etc.)
 
 ### Test
 * The tests included with this application can be run with either `mvn verify` or `mvn integration-test`
@@ -95,5 +97,5 @@ The following categorizes the improvements that could be made to this applicatio
 
 ### Miscellaneous Optimizations
 
-* Server-agnostic application/dependencies (i.e., not reliant on deployment to JBoss EAP/Wildfly)
-* 
+* Server-agnostic application/dependencies (i.e., not reliant on deployment to JBoss EAP/Wildfly) such that are little-to-no changes required to deploy to disparate application servers
+* Consolidation of some source code (e.g., combining `MemberListProducer` with `MemberController`)

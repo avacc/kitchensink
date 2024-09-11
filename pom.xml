@@ -140,6 +140,12 @@
                 <groupId>org.wildfly.plugins</groupId>
                 <artifactId>wildfly-maven-plugin</artifactId>
                 <version>${version.wildfly.maven.plugin}</version>
+<!--                <configuration>-->
+<!--                    <hostname>example.host</hostname>-->
+<!--                    <port>9990</port>-->
+<!--                    <username>user</username>-->
+<!--                    <password>passwd</password>-->
+<!--                </configuration>-->
             </plugin>
         </plugins>
     </build>
