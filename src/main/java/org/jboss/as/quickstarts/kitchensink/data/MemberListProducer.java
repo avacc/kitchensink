@@ -19,11 +19,11 @@ package org.jboss.as.quickstarts.kitchensink.data;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.event.Reception;
-import java.util.List;
-
 import org.jboss.as.quickstarts.kitchensink.model.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 
 @Component

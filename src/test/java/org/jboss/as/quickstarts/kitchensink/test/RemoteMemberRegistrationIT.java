@@ -18,21 +18,19 @@ package org.jboss.as.quickstarts.kitchensink.test;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-
-import java.math.BigInteger;
-import java.util.logging.Logger;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-
 import org.jboss.as.quickstarts.kitchensink.model.Member;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigInteger;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.logging.Logger;
 
 public class RemoteMemberRegistrationIT {
 

@@ -32,5 +32,6 @@ public interface MemberRepository extends MongoRepository<Member, String> {
     List<Member> findAllByOrderByNameAsc();
 
     Member deleteMemberById(BigInteger id);
+
     Member deleteMemberByEmail(String email);
 }

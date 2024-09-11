@@ -28,7 +28,9 @@
     <version>8.0.0.GA</version>
     <packaging>war</packaging>
     <name>Quickstart: kitchensink</name>
-    <description>A starter Jakarta EE web application (modified for use with Spring Boot, Java 21, and MongoDB) for use in JBoss EAP</description>
+    <description>A starter Jakarta EE web application (modified for use with Spring Boot, Java 21, and MongoDB) for use
+        in JBoss EAP
+    </description>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
