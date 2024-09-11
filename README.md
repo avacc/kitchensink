@@ -28,6 +28,16 @@ This project is a simplified migration of a Java-based web application using the
 
 ## Building, Deploying, & Testing the Application
 
+### Prerequisites
+* [OpenJDK 21](https://openjdk.org/install/)
+* [Maven 3](https://maven.apache.org/download.cgi)
+* [JBoss EAP/Wildfly Server](https://www.redhat.com/en/technologies/jboss-middleware/application-platform)
+  * Local or remote
+  * Tested with JBoss EAP 8.0
+* [MongoDB](https://www.mongodb.com/docs/manual/administration/install-community/)
+  * Local or remote
+* [Docker](https://docs.docker.com/engine/install/) (needed when running tests)
+
 ### Build
 
 * To build the `.war` file necessary for running the application, run `mvn package`
@@ -44,16 +54,6 @@ This project is a simplified migration of a Java-based web application using the
 * The tests included with this application can be run with either `mvn verify` or `mvn integration-test`
   * `MemberRegistrationIT` requires that the Docker daemon is running so that the test can execute absent an independently running MongoDB instance
   * The `RemoteMemberRegistrationIT` test expects the application to either be running locally or on a remote host (configured in the `SERVER_HOST` environment variable)
-
-### Prerequisites
-* [OpenJDK 21](https://openjdk.org/install/)
-* [Maven 3](https://maven.apache.org/download.cgi)
-* [JBoss EAP/Wildfly Server](https://www.redhat.com/en/technologies/jboss-middleware/application-platform)
-  * Local or remote
-  * Tested with JBoss EAP 8.0
-* [MongoDB](https://www.mongodb.com/docs/manual/administration/install-community/)
-  * Local or remote
-* [Docker](https://docs.docker.com/engine/install/) (needed when running tests)
 
 ## Considerations for a Larger Scale Migration
 
