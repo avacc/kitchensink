@@ -93,9 +93,11 @@ The following categorizes the improvements that could be made to this applicatio
 
 ### UI
 
+* While still using JSF, improving error and exception handling
 * Replace JSF with something that integrates more neatly with Spring Boot – JoinFaces is fragile and frequently breaks with new versions of both Spring Boot and JSF
 
 ### Miscellaneous Optimizations
 
+* `docker-compose` setup to allow developers to run and iterate on application quickly without having to worry as much about external infrastructure dependencies (e.g., MongoDB)
 * Server-agnostic application/dependencies (i.e., not reliant on deployment to JBoss EAP/Wildfly) such that are little-to-no changes required to deploy to disparate application servers
 * Consolidation of some source code (e.g., combining `MemberListProducer` with `MemberController`)
