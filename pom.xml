@@ -49,13 +49,21 @@
         <version.testcontainers>1.20.0</version.testcontainers>
         <version.slf4j.simple>2.0.13</version.slf4j.simple>
 
+        <version.jakarta.enterprise.cdi>4.1.0</version.jakarta.enterprise.cdi>
+        <version.jakarta.validation>3.1.0</version.jakarta.validation>
+        <version.jakarta.annotation>3.0.0</version.jakarta.annotation>
+        <version.jakarta.ejb>4.0.1</version.jakarta.ejb>
+        <version.jakarta.faces>4.1.0</version.jakarta.faces>
+        <version.jakarta.xml.bind>4.0.2</version.jakarta.xml.bind>
+        <version.jakarta.json>2.1.3</version.jakarta.json>
+        <version.junit>4.13.2</version.junit>
+        <version.eclipse.parsson>1.1.2.redhat-00001</version.eclipse.parsson>
+
         <version.surefire.maven.plugin>3.3.1</version.surefire.maven.plugin>
         <version.failsafe.maven.plugin>3.3.1</version.failsafe.maven.plugin>
         <version.wildfly.maven.plugin>5.0.0.Final</version.wildfly.maven.plugin>
-
-        <version.server.bom>8.0.0.GA-redhat-00009</version.server.bom>
-        <version.eap.maven.plugin>1.0.0.Final-redhat-00014</version.eap.maven.plugin>
         <version.compiler.maven.plugin>3.11.0</version.compiler.maven.plugin>
+        <version.server.bom>8.0.0.GA-redhat-00009</version.server.bom>
     </properties>
 
     <repositories>
@@ -258,8 +266,6 @@
 
         <!-- Pre-migration dependencies -->
 
-        <!-- Import the CDI API, we use provided scope as the API is included in
-        JBoss EAP -->
         <dependency>
             <groupId>jakarta.enterprise</groupId>
             <artifactId>jakarta.enterprise.cdi-api</artifactId>
@@ -270,54 +276,38 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>${version.junit}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Import the Common Annotations API (JSR-250), we use provided scope
-        as the API is included in JBoss EAP -->
-        <dependency>
-            <groupId>jakarta.annotation</groupId>
-            <artifactId>jakarta.annotation-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Import the EJB API, we use provided scope as the API is included in
-        JBoss EAP -->
-        <dependency>
             <groupId>jakarta.ejb</groupId>
             <artifactId>jakarta.ejb-api</artifactId>
-            <scope>provided</scope>
+            <version>${version.jakarta.ejb}</version>
         </dependency>
 
-        <!-- Import the JSF API, we use provided scope as the API is included in
-        JBoss EAP -->
         <dependency>
             <groupId>jakarta.faces</groupId>
             <artifactId>jakarta.faces-api</artifactId>
-            <scope>provided</scope>
+            <version>${version.jakarta.faces}</version>
         </dependency>
 
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
-            <scope>provided</scope>
+            <version>${version.jakarta.xml.bind}</version>
         </dependency>
 
         <dependency>
             <groupId>jakarta.json</groupId>
             <artifactId>jakarta.json-api</artifactId>
-            <scope>test</scope>
+            <version>${version.jakarta.json}</version>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.parsson</groupId>
             <artifactId>parsson</artifactId>
+            <version>${version.eclipse.parsson}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
